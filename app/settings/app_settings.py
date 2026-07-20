@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     Settings class for environtment variables.
     """
     # ------------ APP INFO ------------  
-    APP_NAME: str = "P2P Exchange Tracker"
+    APP_NAME: str = "TusRemesasYa"
     APP_VERSION: str =  __version__
 
     # ------------ Directories and config path ------------  
