@@ -48,6 +48,7 @@ class Settings(BaseSettings):
     BINANCE_EXTRA_FIATS: str
     BINANCE_EXTRA_CRON: str
     BINANCE_VES_CRON: str
+    BINANCE_PEN_CRON: str
     BCV_CRON: str
 
     # ------------ SEGURIDAD ------------  
