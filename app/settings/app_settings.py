@@ -50,6 +50,14 @@ class Settings(BaseSettings):
     BINANCE_VES_CRON: str
     BCV_CRON: str
 
+    # ------------ SEGURIDAD ------------  
+    SECRET_KEY: str = "placeholder-dev-key"  
+    SECURITY_PASSWORD_SALT: str = "placeholder-salt"  
+    JWT_SECRET_KEY: str = "placeholder-jwt-key"  
+    ALGORITHM: str = "HS256"  
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 10080
+
     model_config = SettingsConfigDict(  
         env_file=".env",  
         env_file_encoding="utf-8",  
