@@ -82,4 +82,4 @@ class Settings(BaseSettings):
             print(f" CRITICAL ERROR: Could not create directory {dir}. check permissions.")
             sys.exit(1)
 
-config = Settings()
+settings = Settings()
