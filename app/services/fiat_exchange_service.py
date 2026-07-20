@@ -16,10 +16,10 @@ class FiatExchangeService():
     """
     Service for getting fiat exchange rates with USDT.
     """
-    def __init__(self, database_session: AsyncSession):
-        self.database_session = database_session
+    def __init__(self, databasesession: AsyncSession):
+        self.databasesession = databasesession
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.binance = BinanceService(databasesession=database_session)
+        self.binance = BinanceService(databasesession=databasesession)
 
     def _get_real_time_usdt_pair(self, fiat: FiatCurrency, trade_type: TradeType) -> Optional[BinanceRealTimeResponse]:
         """
