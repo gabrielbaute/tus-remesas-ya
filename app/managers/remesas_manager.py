@@ -118,10 +118,10 @@ class RemesasManager():
             if not asset_fiat_sell:
                 self.logger.error(f"Error saving {currency.value} at {TradeType.SELL.value} type operation on Database.")
 
-            msg = f"Binance USDT/VES Updated: **{asset_fiat_buy.average_price:.3f} {currency.value}/{asset.value}** at Buy, **{asset_fiat_sell.average_price:.3f} {currency.value}/{asset.value}** at Sell"
+            msg = f"Binance {currency.value}/{asset.value} Updated: **{asset_fiat_buy.average_price:.3f} {currency.value}/{asset.value}** at Buy, **{asset_fiat_sell.average_price:.3f} {currency.value}/{asset.value}** at Sell"
             self.logger.info(msg)
             self._send_alert(
-                title="Binance USDT/VES Updated",
+                title=f"Binance {currency.value}/{asset.value} Updated",
                 event="binance_update",
                 priority=WebhookPriority.low,
                 msg=msg,
