@@ -1,0 +1,44 @@
+from typing import Any, Dict
+from app.errors.base_error import RemesasError
+
+class BCVConnectionError(RemesasError):
+    """Error raised when there is a connection issue with the BCV website."""
+    def __init__(self, message: str = "Error connecting to the BCV website.", details=None):
+        super().__init__(message, details)
+    
+class BCVReadingRateError(RemesasError):
+    """Error raised when there is an issue reading the rate from the BCV website."""
+    def __init__(self, message: str = "Error reading the rate from the BCV website.", details=None):
+        super().__init__(message, details)
+
+class RegisterNotFoundError(RemesasError):
+    """Error raised when a rate register is not found on the database."""
+    def __init__(self, message: str = "Register not found", details=None):
+        super().__init__(message, details)
+
+class DatabaseSessionError(RemesasError):
+    """Error raised when there is an issue with the database session."""
+    def __init__(self, message: str = "Database session error", details=None):
+        super().__init__(message, details)
+
+class DatabaseOperationError(RemesasError):
+    """Error raised when there is an issue with a database operation."""
+    def __init__(self, message: str = "Database operation error", details=None):
+        super().__init__(message, details)
+
+class BinanceConnectionError(RemesasError):
+    """Error raised when there is a connection issue with the Binance P2P API."""
+    def __init__(self, message: str = "Error connecting to the Binance P2P API.", details=None):
+        super().__init__(message, details)
+
+class BinanceRequestError(RemesasError):
+    """Error raised when there is an issue with the request to the Binance P2P API."""
+    def __init__(self, message: str = "Error with the request to the Binance P2P API.", details=None):
+        super().__init__(message, details)
+
+class MigrationError:
+    """Representa un error de migración para un registro específico."""
+    def __init__(self, record_index: int, original_record: Dict[str, Any], error: str):
+        self.record_index = record_index
+        self.original_record = original_record
+        self.error = error
