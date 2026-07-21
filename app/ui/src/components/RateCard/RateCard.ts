@@ -2,7 +2,7 @@ import { defineComponent, type PropType } from "vue";
 
 /**
  * Componente modular para representar una métrica o tasa individual
- * con estilos metálicos, etiqueta de moneda/dirección y formato numérico.
+ * con estilos institucionales, etiqueta de moneda/dirección y formato numérico.
  */
 export default defineComponent({
   name: "RateCard",
@@ -32,7 +32,7 @@ export default defineComponent({
       type: String,
       default: "",
     },
-    /** Define el esquema de color del indicador metálico (cyan, emerald, amber, indigo) */
+    /** Define el esquema de color del indicador (cyan, emerald, amber, indigo) */
     accentColor: {
       type: String as PropType<"cyan" | "emerald" | "amber" | "indigo">,
       default: "cyan",
