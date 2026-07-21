@@ -1,0 +1,17 @@
+{
+  "tasks": {
+    "clean": "deno run -A npm:rimraf dist",
+    "prebuild": "deno task clean",
+    "dev": "deno run -A --node-modules-dir npm:vite dev",
+    "build": "deno run -A --node-modules-dir npm:vue-tsc -b && deno run -A --node-modules-dir npm:vite build",
+    "preview": "deno run -A --node-modules-dir npm:vite preview",
+    "generate-client": "deno run -A npm:openapi-typescript http://127.0.0.1:8010/openapi.json -o ./src/api/schema.d.ts"
+  },
+  "imports": {
+    "vue": "npm:vue@^3.5.30",
+    "openapi-fetch": "npm:openapi-fetch@^0.17.0"
+  },
+  "overrides": {
+    "typescript": "npm:typescript@~5.9.3"
+  }
+}
