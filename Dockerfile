@@ -1,5 +1,5 @@
 # ==========================================
-# Etapa 0: Builder Frontend (TypeScript -> Bundle)
+# Etapa 0: Builder Frontend (TypeScript + Vue 3 -> Bundle)
 # ==========================================
 FROM node:20-alpine AS ui-builder
 
@@ -8,21 +8,28 @@ WORKDIR /app
 ARG VCS_REF=local
 ARG BUILD_DATE=unknown
 
-COPY package.json tsconfig.json ./
-RUN npm install
-COPY app/ui/src ./app/ui/src
-COPY app/ui/static ./app/ui/static
+# Copiar archivos de dependencias y configuración del frontend
+COPY package.json package-lock.json* tsconfig*.json vite.config.ts ./
+RUN npm ci || npm install
+
+# Copiar el código fuente del frontend y recursos estáticos
+COPY src ./src
+COPY index.html ./
+
+# Inyectar información de construcción para trazabilidad
 RUN echo "ui-build-ref=${VCS_REF} ui-build-date=${BUILD_DATE}" > /tmp/ui-build-info.txt
-RUN npm run build:ui
+
+# Compilar TypeScript y empaquetar con Vite/Tailwind
+RUN npm run build
 
 # ==========================================
-# Etapa 1: Constructor (Builder Nativo con uv)
+# Etapa 1: Builder Backend (Python con uv)
 # ==========================================
 FROM python:3.11-slim AS builder
 
 # Evitar la generación de archivos .pyc en la etapa de compilación
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
@@ -30,8 +37,6 @@ WORKDIR /app
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Sincronización de dependencias usando la caché nativa de uv y montajes eficientes
-# Nota: Si el proyecto usa un requirements.txt clásico en lugar de pyproject.toml, 
-# se puede cambiar por: uv pip compile / uv pip install. Asumimos el estándar moderno de uv.
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -42,7 +47,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # ==========================================
 FROM python:3.11-slim AS runtime
 
-# Mantener consistencia con las variables de optimización de python
+# Variables de optimización y configuración del runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     LOG_DIR="/logs" \
@@ -55,36 +60,36 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app
 
-# Instalación de utilidades esenciales para producción (curl requerido para el HEALTHCHECK)
+# Instalación de utilidades esenciales para producción (curl para HEALTHCHECK)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Crear usuario, grupo sin privilegios y directorios de persistencia necesarios
-RUN groupadd -r dolar_vzl -g 1000 && \
-    useradd -u 1000 -g dolar_vzl -m -s /bin/bash dolar_vzl && \
+# Crear usuario y grupo sin privilegios (tus_remesas_ya:1000) e infraestructura de directorios
+RUN groupadd -r tus_remesas_ya -g 1000 && \
+    useradd -u 1000 -g tus_remesas_ya -m -s /bin/bash tus_remesas_ya && \
     mkdir -p /logs /instance && \
-    chown -R dolar_vzl:dolar_vzl /logs /instance /app
+    chown -R tus_remesas_ya:tus_remesas_ya /logs /instance /app
 
-# Copiar el entorno virtual aislado desde la etapa de compilación
-COPY --from=builder --chown=dolar_vzl:dolar_vzl /app/.venv /app/.venv
+# Copiar el entorno virtual aislado generado por 'uv'
+COPY --from=builder --chown=tus_remesas_ya:tus_remesas_ya /app/.venv /app/.venv
 
-# Copiar la aplicación garantizando que el usuario no privilegiado sea el dueño
-COPY --chown=dolar_vzl:dolar_vzl . .
+# Copiar la aplicación backend garantizando propiedad al usuario sin privilegios
+COPY --chown=tus_remesas_ya:tus_remesas_ya . .
 
-# Sobrescribir el bundle con la compilacion generada en la etapa frontend
-COPY --from=ui-builder --chown=dolar_vzl:dolar_vzl /app/app/ui/static/js/app.js /app/app/ui/static/js/app.js
+# Copiar el resultado compilado del frontend (dist/ de Vite) hacia la carpeta de estáticos
+COPY --from=ui-builder --chown=tus_remesas_ya:tus_remesas_ya /app/dist /app/static/dist
 
-# Diagnóstico de salud del contenedor usando la ruta asignada
+# Diagnóstico de salud del contenedor
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:${API_PORT}/health || exit 1
 
-# Exponer el puerto de la API configurado
+# Exponer el puerto de servicio
 EXPOSE 8000
 
-# Cambiar de forma definitiva al usuario seguro
-USER dolar_vzl
+# Cambiar al usuario seguro del proyecto
+USER tus_remesas_ya
 
-# Comando de arranque optimizado invocando directamente uvicorn desde el .venv compartido al PATH
+# Comando de arranque del servidor Uvicorn / Gunicorn
 CMD ["sh", "-c", "uvicorn app.main:app --host ${API_HOST} --port ${API_PORT}"]
