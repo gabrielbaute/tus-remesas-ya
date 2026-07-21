@@ -1,1 +1,51 @@
 @import "tailwindcss";
+
+/* Tokens por defecto: Light Theme (Western Union) */
+@theme {
+  --color-primary: #FFCC00;
+  --color-primary-hover: #E6B800;
+  --color-primary-light: #FFF0B3;
+
+  --color-bg-main: #F4F4F5;
+  --color-bg-card: #FFFFFF;
+  --color-bg-elevated: #E4E4E7;
+
+  --color-border-main: #E4E4E7;
+  --color-border-focus: #18181B;
+
+  --color-text-main: #18181B;
+  --color-text-muted: #71717A;
+  --color-text-inverse: #FFFFFF;
+
+  --color-success: #059669;
+  --color-error: #DC2626;
+}
+
+/* Sobrescribimos las variables CSS cuando la clase 'dark' está presente en <html> */
+:root.dark {
+  --color-primary: #FFCC00;
+  --color-primary-hover: #E6B800;
+  --color-primary-light: #FFDC43;
+
+  --color-bg-main: #121212;
+  --color-bg-card: #1E1E1E;
+  --color-bg-elevated: #2A2A2A;
+
+  --color-border-main: #2E2E2E;
+  --color-border-focus: #FFCC00;
+
+  --color-text-main: #FFFFFF;
+  --color-text-muted: #A1A1AA;
+  --color-text-inverse: #121212;
+
+  --color-success: #10B981;
+  --color-error: #EF4444;
+}
+
+/* Aplicación de reglas globales */
+body {
+  background-color: var(--color-bg-main);
+  color: var(--color-text-main);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
