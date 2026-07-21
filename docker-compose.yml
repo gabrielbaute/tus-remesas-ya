@@ -1,0 +1,26 @@
+services:
+  tusremesasya:
+    container_name: tusremesasya
+    image: ghcr.io/gabrielbaute/tus-remesas-ya:latest
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8010}:8010"
+    environment:
+      - API_PORT=${API_PORT:-8010}
+      - API_HOST=${API_HOST:-0.0.0.0}
+      - NTFY_URL=${NTFY_URL:-}
+      - NTFY_TOPIC=${NTFY_TOPIC:-}
+      - BINANCE_EXTRA_FIATS=${BINANCE_EXTRA_FIATS:-}
+      - BINANCE_EXTRA_CRON=${BINANCE_EXTRA_CRON:-}
+      - BINANCE_VES_CRON=${BINANCE_VES_CRON:-}
+      - BINANCE_PEN_CRON=${BINANCE_PEN_CRON:-}
+      - BCV_CRON=${BCV_CRON:-}
+    volumes:
+      - ./instance:/app/instance
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${API_PORT:-8010}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
