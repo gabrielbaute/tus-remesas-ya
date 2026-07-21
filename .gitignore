@@ -13,9 +13,15 @@ wheels/
 *.env
 
 # Database
-*.db
 instance/
+*.db
+*.db-shm
+*.db-wal
 
 # Logs
 *.log
 logs/
+
+# Repomix
+*.egg-info
+repomix-output.xml
