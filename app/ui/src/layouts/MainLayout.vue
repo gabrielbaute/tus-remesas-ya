@@ -1,7 +1,7 @@
-<!-- Layout Principal de la Aplicación -->
+<!-- Layout Principal de la Aplicación con tokens semánticos -->
 <template>
-  <!-- Contenedor raíz con fondo oscuro metálico profundo estilo titanio -->
-  <div class="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-slate-950">
+  <!-- Contenedor raíz: Fondo principal de alto contraste y texto claro con selección en color primario -->
+  <div class="min-h-screen flex flex-col bg-bg-main text-text-main font-sans antialiased selection:bg-primary selection:text-text-inverse">
     
     <!-- Encabezado modular -->
     <HeaderComponent />
@@ -14,19 +14,10 @@
     <!-- Pie de página modular -->
     <FooterComponent />
 
+    <!-- Selector de Tema Flotante (Light / Dark) -->
+    <ThemeToggle />
+
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import HeaderComponent from "../components/Header/Header.vue";
-import FooterComponent from "../components/Footer/Footer.vue";
-
-export default defineComponent({
-  name: "MainLayout",
-  components: {
-    HeaderComponent,
-    FooterComponent,
-  },
-});
-</script>
+<script lang="ts" src="./MainLayout.ts"></script>
