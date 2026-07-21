@@ -25,6 +25,7 @@
 
       <!-- Fila Inferior: Badges de Referencia P2P USDT (Compactos) -->
       <div class="flex flex-wrap items-center gap-3 pt-1">
+        <!-- Comentario: Etiqueta descriptiva para el bloque de referencias Binance P2P -->
         <span class="text-xs font-mono text-text-muted uppercase tracking-wider font-semibold">
           Referencia P2P Binance:
         </span>
@@ -34,7 +35,7 @@
           <span class="text-text-muted">USDT/VES:</span>
           <span v-if="isLoading" class="animate-pulse text-text-muted">...</span>
           <span v-else class="font-bold text-primary">
-            {{ pairData?.fiat_1_p2p_buy?.average_price ? `${pairData.fiat_1_p2p_buy.average_price} Bs` : 'N/A' }}
+            {{ pairData?.fiat_1_p2p_buy?.average_price ? `${formatPrice(pairData.fiat_1_p2p_buy.average_price, 2)} Bs` : 'N/A' }}
           </span>
         </div>
 
@@ -43,7 +44,7 @@
           <span class="text-text-muted">USDT/PEN:</span>
           <span v-if="isLoading" class="animate-pulse text-text-muted">...</span>
           <span v-else class="font-bold text-success">
-            {{ pairData?.fiat_2_p2p_buy?.average_price ? `${pairData.fiat_2_p2p_buy.average_price} S/.` : 'N/A' }}
+            {{ pairData?.fiat_2_p2p_buy?.average_price ? `${formatPrice(pairData.fiat_2_p2p_buy.average_price, 2)} S/.` : 'N/A' }}
           </span>
         </div>
       </div>

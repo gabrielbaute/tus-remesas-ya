@@ -1,7 +1,6 @@
 import { defineComponent, onMounted, ref, computed } from "vue";
 import { arbitrageService, type FiatPairData, type TodayPenVesData } from "../services/ArbitrageService";
 import RateCard from "../components/RateCard/RateCard.vue";
-// Ruta corregida apuntando a la carpeta /Calculator/
 import RemittanceCalculator from "../components/Calculator/RemittanceCalculator.vue";
 
 /**
@@ -46,6 +45,23 @@ export default defineComponent({
     });
 
     /**
+     * Formatea un valor numérico restringiendo la cantidad de decimales.
+     *
+     * Args:
+     *     value (number | undefined | null): Valor numérico a formatear.
+     *     decimals (number): Cantidad de decimales deseados (por defecto 2).
+     *
+     * Returns:
+     *     string: Valor numérico formateado o 'N/A' si el dato es inválido.
+     */
+    const formatPrice = (value: number | undefined | null, decimals: number = 2): string => {
+      if (value === undefined || value === null || isNaN(value)) {
+        return "N/A";
+      }
+      return value.toFixed(decimals);
+    };
+
+    /**
      * Carga en paralelo los datos P2P y las tasas diarias de la API de arbitraje.
      *
      * Returns:
@@ -84,6 +100,7 @@ export default defineComponent({
       isLoading,
       errorMessage,
       formattedDate,
+      formatPrice,
       loadDashboardData,
     };
   },

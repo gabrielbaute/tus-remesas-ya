@@ -16,16 +16,16 @@ export default defineComponent({
   name: "AboutView",
   setup() {
     // Número telefónico corporativo para soporte por WhatsApp (formato internacional sin signos)
-    const whatsappPhoneNumber: string = "51900000000";
+    const whatsappPhoneNumber: string = "+51952075851";
     
     // Mensaje predeterminado al iniciar la conversación por WhatsApp
     const defaultMessage: string = "¡Hola! Quisiera obtener información sobre el servicio de remesas y las tasas actuales.";
 
     // Enlaces de redes sociales oficiales
     const socialLinks: SocialLinks = {
-      whatsappChannel: "https://whatsapp.com/channel/ejemplo",
-      instagram: "https://instagram.com/tusremesasya",
-      tiktok: "https://tiktok.com/@tusremesasya",
+      whatsappChannel: "https://whatsapp.com/channel/0029VbC434jE50UeGA9jhB1l",
+      instagram: "https://www.instagram.com/tusremesasyave?utm_source=qr&igsh=Y3czc29sYnoycjVl",
+      tiktok: "https://tiktok.com/@andres.remesas",
     };
 
     /**

@@ -98,7 +98,7 @@ export default defineComponent({
     const whatsappUrl = computed<string>(() => {
       const result = calculationResult.value;
       if (!result) {
-        return "https://wa.me/51900000000?text=Hola,%20quisiera%20consultar%20sobre%20el%20envío%20de%20remesas.";
+        return "https://wa.me/+51952075851?text=Hola,%20quisiera%20consultar%20sobre%20el%20envío%20de%20remesas.";
       }
 
       const message =
@@ -108,7 +108,7 @@ export default defineComponent({
         `• Tasa aplicada: ${formattedRateText.value}\n` +
         `¿Me indican los datos para proceder con el depósito?`;
 
-      return `https://wa.me/51900000000?text=${encodeURIComponent(message)}`;
+      return `https://wa.me/+51952075851?text=${encodeURIComponent(message)}`;
     });
 
     onMounted(() => {
