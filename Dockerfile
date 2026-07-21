@@ -8,18 +8,18 @@ WORKDIR /app
 ARG VCS_REF=local
 ARG BUILD_DATE=unknown
 
-# Copiar archivos de dependencias y configuración del frontend
-COPY package.json package-lock.json* tsconfig*.json vite.config.ts ./
+# Copiar archivos de dependencias desde la subcarpeta (ej. app/ui)
+COPY app/ui/package.json app/ui/package-lock.json* app/ui/tsconfig*.json app/ui/vite.config.ts ./
 RUN npm ci || npm install
 
-# Copiar el código fuente del frontend y recursos estáticos
-COPY src ./src
-COPY index.html ./
+# Copiar el código fuente y recursos estáticos desde la subcarpeta
+COPY app/ui/src ./src
+COPY app/ui/index.html ./
 
-# Inyectar información de construcción para trazabilidad
+# Inyectar información de construcción
 RUN echo "ui-build-ref=${VCS_REF} ui-build-date=${BUILD_DATE}" > /tmp/ui-build-info.txt
 
-# Compilar TypeScript y empaquetar con Vite/Tailwind
+# Compilar el frontend
 RUN npm run build
 
 # ==========================================
