@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.settings import Settings
+from app.api.setup_client import setup_web_client
 from app.api.include_routers import include_routers
 
 def create_app(settings: Settings) -> FastAPI:
@@ -33,7 +34,8 @@ def create_app(settings: Settings) -> FastAPI:
         allow_headers=["*"],
         allow_credentials=True,
     )
-
+    
+    setup_web_client(app=app, settings=settings)
     include_routers(app, prefix="/api/v1")
 
     return app

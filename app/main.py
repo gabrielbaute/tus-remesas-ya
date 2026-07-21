@@ -2,14 +2,16 @@
 Main application entry point configuring lifespan handlers, schedules and logging structures.
 """
 import uvicorn
+from pathlib import Path
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
 from app.settings.app_settings import settings
 from app.settings.app_logger import TusRemesasYaLogger
 from app.database import db_manager
-from app.api import create_app, register_error_handlers
 from app.managers import RemesasManager
+from app.api import create_app, register_error_handlers
 
 TusRemesasYaLogger.setup_logging(logs_dir=settings.LOGS_DIR, level=settings.LOG_LEVEL)
 
