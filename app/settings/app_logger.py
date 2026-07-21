@@ -47,7 +47,7 @@ class TusRemesasYaLogger:
         if not logs_dir.exists():  
             logs_dir.mkdir(parents=True, exist_ok=True)  
           
-        log_file: Path = logs_dir / "dolar_vzla.log"
+        log_file: Path = logs_dir / "tusremesasya.log"
 
         # Definimos el formato base  
         log_format = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"  
