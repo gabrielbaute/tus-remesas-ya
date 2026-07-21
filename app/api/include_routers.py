@@ -6,6 +6,7 @@ from app.api.routes.binance_routes import router as binance_router
 from app.api.routes.history_routes import router as history_router
 from app.api.routes.fiat_routes import router as fiat_router
 from app.api.routes.health_routes import router as health_router
+from app.api.routes.ui_routes import router as ui_router
 
 
 def include_routers(app: FastAPI, prefix: str = ""):
@@ -18,3 +19,4 @@ def include_routers(app: FastAPI, prefix: str = ""):
     app.include_router(history_router, prefix=prefix)
     app.include_router(fiat_router, prefix=prefix)
     app.include_router(health_router, prefix=prefix)
+    app.include_router(ui_router)
