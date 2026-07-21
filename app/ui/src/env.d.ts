@@ -1,5 +1,3 @@
-// src/env.d.ts
-
 /**
  * Declaración global de módulo para permitir la importación de componentes Single File Component (.vue)
  * en archivos de código TypeScript (.ts).
