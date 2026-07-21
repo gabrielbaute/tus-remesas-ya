@@ -4,7 +4,7 @@ API Inversion of Control and Dependency Injection Module.
 This module encapsulates initialization graphs for operational database sessions,
 centralized configurations, and business core services inside the API route lifecycles.
 """
-
+from pathlib import Path
 from typing import AsyncGenerator
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,9 +17,9 @@ from app.services import (
     DolarVenezuelaService,
     FiatExchangeService,
     NtfyWebhookService,
-    ArbitrageService
+    ArbitrageService,
+    UIService
 )
-
 
 def get_settings_instance() -> Settings:
     """
@@ -138,6 +138,21 @@ def get_arbitrage_service(
         databasesession (AsyncSession): Scoped transactional interface bound to the current request.
 
     Returns:
-        FiatExchengeService: Active service tracking foreign pairs and exchange indices.
+        FiatExchengeService: Active service for arbitrage operations.
     """
     return ArbitrageService(databasesession=databasesession)
+
+def get_ui_service(
+        settings: Settings = Depends(get_settings_instance)
+) -> UIService:
+    """
+    Inject de ui service for provide static files.
+
+    Args:
+        ui_directory (Path): path to the static files
+    
+    Returns:
+        UIService: Active servie to serve static files.
+    """
+    ui_directory: Path = settings.BASE_DIR / "app" / "ui" / "dist"
+    return UIService(ui_directory=ui_directory)
