@@ -16,7 +16,7 @@
             </div>
             <!-- Nombre de la plataforma -->
             <span class="text-lg font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-slate-200 to-slate-400">
-              REMESAS<span class="text-cyan-400 font-extrabold">VES-PEN</span>
+              TUS REMESAS <span class="text-cyan-400 font-extrabold">YA</span>
             </span>
           </router-link>
         </div>

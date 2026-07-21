@@ -40,4 +40,4 @@ class UIService:
                 detail="Distribution assets not found. Run the frontend build process first.",
             )
         self.logger.info("Sirviendo sitio web")
-        return FileResponse(path=self._index_file, media_type="text/html")
+        return FileResponse(self._index_file)

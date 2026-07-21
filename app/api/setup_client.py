@@ -21,7 +21,6 @@ def setup_web_client(app: FastAPI, settings: Settings) -> None:
     dist_dir: Path = settings.BASE_DIR / "app" / "ui" / "dist"
     assets_dir: Path = dist_dir / "assets"
 
-    # Montar el directorio de activos compilados por Vite (/assets)
     if assets_dir.is_dir():
         app.mount(
             "/assets",
@@ -31,8 +30,7 @@ def setup_web_client(app: FastAPI, settings: Settings) -> None:
         logger.info(f"Static web assets successfully mounted from: {assets_dir}")
     else:
         logger.warning(
-            f"Web client assets directory not found at {assets_dir}. SPA may not load assets correctly."
+            f"Web client assets directory not found at {assets_dir}. Did you run 'deno task build' inside ui/?"
         )
-
-    # Registrar el router de la interfaz para la entrada index.html y fallback de rutas
+    
     app.include_router(ui_router)

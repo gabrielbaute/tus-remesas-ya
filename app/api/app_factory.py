@@ -1,7 +1,7 @@
 """
 FastAPI Application Factory module
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.settings import Settings
@@ -35,7 +35,17 @@ def create_app(settings: Settings) -> FastAPI:
         allow_credentials=True,
     )
     
-    setup_web_client(app=app, settings=settings)
+    # Middleware para prevenir la caché del navegador en los endpoints de la API
+    @app.middleware("http")
+    async def add_no_cache_header(request: Request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/api"):
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+        return response
+
     include_routers(app, prefix="/api/v1")
+    setup_web_client(app=app, settings=settings)
 
     return app
