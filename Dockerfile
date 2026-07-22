@@ -1,18 +1,20 @@
 # ==========================================
 # Etapa 0: Builder Frontend (Deno + Vue 3 -> Bundle)
+# Usamos Debian para soporte nativo de binarios Node/npm (Rolldown/Vite)
 # ==========================================
-FROM denoland/deno:alpine AS ui-builder
+FROM denoland/deno:debian AS ui-builder
 
 WORKDIR /app
 
-# 1. Instalar git y gcompat (necesario para binarios nativos de npm en Alpine)
-RUN apk add --no-cache git gcompat
+# 1. Instalar git
+RUN apt-get update && apt-get install -y --no-install-recommends git && \
+    rm -rf /var/lib/apt/lists/*
 
 # 2. Copiar manifiesto y lockfile del frontend
 COPY app/ui/deno.json app/ui/deno.lock ./
 
-# 3. Instalar dependencias del frontend garantizando los bindings de Node
-RUN deno install --entrypoint deno.json
+# 3. Instalar dependencias del frontend
+RUN deno install
 
 # 4. Copiar el código fuente completo de la interfaz
 COPY app/ui/ ./
