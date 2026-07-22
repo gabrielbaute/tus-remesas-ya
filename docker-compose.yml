@@ -1,3 +1,7 @@
+# ==============================================================================
+# Docker Compose for Production Environment
+# Project: tus-remesas-ya
+# ==============================================================================
 services:
   tusremesasya:
     container_name: tusremesasya
@@ -7,12 +11,38 @@ services:
       - .env
     ports:
       - "${API_PORT:-8010}:${API_PORT:-8010}"
+
     volumes:
-      - ./instance:/instance
-      - ./logs:/logs
+      - tusremesasya_instance:/instance
+      - tusremesasya_logs:/logs
+
+    # Control de logs de Docker para proteger el espacio en disco
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Límites de recursos en producción
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${API_PORT:-8010}/health"]
-      interval: 15s
+      interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 10s
+      start_period: 20s
+
+# Volúmenes administrados directamente por Docker
+volumes:
+  tusremesasya_instance:
+    name: tusremesasya_instance_data
+  tusremesasya_logs:
+    name: tusremesasya_logs_data
