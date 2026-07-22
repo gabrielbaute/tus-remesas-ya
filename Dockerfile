@@ -8,17 +8,14 @@ WORKDIR /app
 ARG VCS_REF=local
 ARG BUILD_DATE=unknown
 
-# 1. Copiar manifiesto y lockfile de Deno
+# 1. Copiar manifiesto y lockfile
 COPY app/ui/deno.json app/ui/deno.lock ./
 
 # 2. Instalar dependencias
 RUN deno install
 
-# 3. Copiar el resto del código del frontend
-COPY app/ui/src ./src
-COPY app/ui/index.html ./index.html
-COPY app/ui/vite.config.ts ./vite.config.ts
-COPY app/ui/tsconfig*.json ./
+# 3. Copiar TODO el código fuente de la UI (incluyendo tsconfig, env.d.ts, src, public, etc.)
+COPY app/ui/ ./
 
 # Inyectar información de construcción
 RUN echo "ui-build-ref=${VCS_REF} ui-build-date=${BUILD_DATE}" > /tmp/ui-build-info.txt
