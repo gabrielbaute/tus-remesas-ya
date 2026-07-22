@@ -74,11 +74,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Crear usuario sin privilegios y carpetas del sistema
 RUN groupadd -r tus_remesas_ya -g 1000 && \
     useradd -u 1000 -g tus_remesas_ya -m -s /bin/bash tus_remesas_ya && \
-    mkdir -p /logs /instance && \
+    mkdir -p /logs /instance /app && \
     chown -R tus_remesas_ya:tus_remesas_ya /logs /instance /app
 
-# Copiar el entorno virtual con las dependencias instaladas
+# Copiar el entorno virtual asegurando chown Y permisos explícitos de ejecución (755)
 COPY --from=builder --chown=tus_remesas_ya:tus_remesas_ya /app/.venv /app/.venv
+RUN chmod -R 755 /app/.venv
 
 # Copiar el código fuente del proyecto
 COPY --chown=tus_remesas_ya:tus_remesas_ya . .
