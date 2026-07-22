@@ -11,8 +11,8 @@ ARG BUILD_DATE=unknown
 # 1. Copiar manifiesto y lockfile de Deno
 COPY app/ui/deno.json app/ui/deno.lock ./
 
-# 2. Instalar dependencias exactas usando el lockfile de Deno
-RUN deno install --frozen
+# 2. Instalar dependencias
+RUN deno install
 
 # 3. Copiar el resto del código del frontend
 COPY app/ui/src ./src
