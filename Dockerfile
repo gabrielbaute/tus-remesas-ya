@@ -5,24 +5,24 @@ FROM denoland/deno:alpine AS ui-builder
 
 WORKDIR /app
 
-# Copiar manifiesto y lockfile del frontend
+# 1. Instalar git y gcompat (necesario para binarios nativos de npm en Alpine)
+RUN apk add --no-cache git gcompat
+
+# 2. Copiar manifiesto y lockfile del frontend
 COPY app/ui/deno.json app/ui/deno.lock ./
 
-# Instalar dependencias del frontend
-RUN deno install
+# 3. Instalar dependencias del frontend garantizando los bindings de Node
+RUN deno install --entrypoint deno.json
 
-# Copiar el código fuente completo de la interfaz
+# 4. Copiar el código fuente completo de la interfaz
 COPY app/ui/ ./
 
-# Instalar git para obtener el hash del commit (Alpine)
-# e inyectar la fecha UTC real y el hash automáticamente
-RUN apk add --no-cache git && \
-    BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') && \
+# 5. Inyectar metadatos de construcción
+RUN BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') && \
     VCS_REF=$(git rev-parse --short HEAD 2>/dev/null || echo "local") && \
-    echo "ui-build-ref=${VCS_REF} ui-build-date=${BUILD_DATE}" > /tmp/ui-build-info.txt && \
-    apk del git
+    echo "ui-build-ref=${VCS_REF} ui-build-date=${BUILD_DATE}" > /tmp/ui-build-info.txt
 
-# Generar el bundle de producción (resultado en /app/dist)
+# 6. Generar el bundle de producción (resultado en /app/dist)
 RUN deno task build
 
 # ==========================================
