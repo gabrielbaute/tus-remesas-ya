@@ -5,22 +5,24 @@ FROM denoland/deno:alpine AS ui-builder
 
 WORKDIR /app
 
-ARG VCS_REF=local
-ARG BUILD_DATE=unknown
-
-# 1. Copiar manifiesto y lockfile
+# Copiar manifiesto y lockfile del frontend
 COPY app/ui/deno.json app/ui/deno.lock ./
 
-# 2. Instalar dependencias
+# Instalar dependencias del frontend
 RUN deno install
 
-# 3. Copiar TODO el código fuente de la UI (incluyendo tsconfig, env.d.ts, src, public, etc.)
+# Copiar el código fuente completo de la interfaz
 COPY app/ui/ ./
 
-# Inyectar información de construcción
-RUN echo "ui-build-ref=${VCS_REF} ui-build-date=${BUILD_DATE}" > /tmp/ui-build-info.txt
+# Instalar git para obtener el hash del commit (Alpine)
+# e inyectar la fecha UTC real y el hash automáticamente
+RUN apk add --no-cache git && \
+    BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') && \
+    VCS_REF=$(git rev-parse --short HEAD 2>/dev/null || echo "local") && \
+    echo "ui-build-ref=${VCS_REF} ui-build-date=${BUILD_DATE}" > /tmp/ui-build-info.txt && \
+    apk del git
 
-# 4. Generar el bundle de producción
+# Generar el bundle de producción (resultado en /app/dist)
 RUN deno task build
 
 # ==========================================
@@ -28,16 +30,16 @@ RUN deno task build
 # ==========================================
 FROM python:3.11-slim AS builder
 
-# Evitar la generación de archivos .pyc en la etapa de compilación
+# Evitar la generación de bytecode (.pyc)
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Extraer el binario de 'uv' directamente desde la imagen oficial
+# Extraer el binario de 'uv' desde la imagen oficial
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Sincronización de dependencias usando la caché nativa de uv y montajes eficientes
+# Sincronización de dependencias del backend usando caché
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -48,7 +50,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # ==========================================
 FROM python:3.11-slim AS runtime
 
-# Variables de optimización y configuración del runtime
+# Variables de entorno del runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     LOG_DIR="/logs" \
@@ -56,41 +58,39 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     API_PORT=8000 \
     API_HOST="0.0.0.0"
 
-# Inyectar el entorno virtual generado directamente al PATH global de ejecución
+# Añadir el entorno virtual al PATH global
 ENV PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app
 
-# Instalación de utilidades esenciales para producción (curl para HEALTHCHECK)
+# Instalación de utilidades esenciales para healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Crear usuario y grupo sin privilegios (tus_remesas_ya:1000) e infraestructura de directorios
+# Crear usuario sin privilegios y carpetas del sistema
 RUN groupadd -r tus_remesas_ya -g 1000 && \
     useradd -u 1000 -g tus_remesas_ya -m -s /bin/bash tus_remesas_ya && \
     mkdir -p /logs /instance && \
     chown -R tus_remesas_ya:tus_remesas_ya /logs /instance /app
 
-# Copiar el entorno virtual aislado generado por 'uv'
+# Copiar el entorno virtual con las dependencias instaladas
 COPY --from=builder --chown=tus_remesas_ya:tus_remesas_ya /app/.venv /app/.venv
 
-# Copiar la aplicación backend garantizando propiedad al usuario sin privilegios
+# Copiar el código fuente del proyecto
 COPY --chown=tus_remesas_ya:tus_remesas_ya . .
 
-# Copiar el resultado compilado del frontend (dist/ de Vite) hacia la carpeta de estáticos
-COPY --from=ui-builder --chown=tus_remesas_ya:tus_remesas_ya /app/dist /app/static/dist
+# Copiar los estáticos compilados a la ruta esperada por la API (app/ui/dist)
+COPY --from=ui-builder --chown=tus_remesas_ya:tus_remesas_ya /app/dist /app/app/ui/dist
 
-# Diagnóstico de salud del contenedor
+# Verificación de estado del servicio
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:${API_PORT}/health || exit 1
 
-# Exponer el puerto de servicio
 EXPOSE 8000
 
-# Cambiar al usuario seguro del proyecto
 USER tus_remesas_ya
 
-# Comando de arranque del servidor Uvicorn / Gunicorn
+# Comando de ejecución del backend
 CMD ["sh", "-c", "uvicorn app.main:app --host ${API_HOST} --port ${API_PORT}"]
