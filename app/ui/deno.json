@@ -12,6 +12,6 @@
     "openapi-fetch": "npm:openapi-fetch@^0.17.0"
   },
   "overrides": {
-    "typescript": "npm:typescript@~5.9.3"
+    "typescript": "npm:typescript@~6.0.3"
   }
 }
