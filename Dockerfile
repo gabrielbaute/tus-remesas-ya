@@ -1,26 +1,30 @@
 # ==========================================
-# Etapa 0: Builder Frontend (TypeScript + Vue 3 -> Bundle)
+# Etapa 0: Builder Frontend (Deno + Vue 3 -> Bundle)
 # ==========================================
-FROM node:20-alpine AS ui-builder
+FROM denoland/deno:alpine AS ui-builder
 
 WORKDIR /app
 
 ARG VCS_REF=local
 ARG BUILD_DATE=unknown
 
-# Copiar archivos de dependencias desde la subcarpeta (ej. app/ui)
-COPY app/ui/package.json app/ui/package-lock.json* app/ui/tsconfig*.json app/ui/vite.config.ts ./
-RUN npm ci || npm install
+# 1. Copiar manifiesto y lockfile de Deno
+COPY app/ui/deno.json app/ui/deno.lock ./
 
-# Copiar el código fuente y recursos estáticos desde la subcarpeta
+# 2. Instalar dependencias exactas usando el lockfile de Deno
+RUN deno install --frozen
+
+# 3. Copiar el resto del código del frontend
 COPY app/ui/src ./src
-COPY app/ui/index.html ./
+COPY app/ui/index.html ./index.html
+COPY app/ui/vite.config.ts ./vite.config.ts
+COPY app/ui/tsconfig*.json ./
 
 # Inyectar información de construcción
 RUN echo "ui-build-ref=${VCS_REF} ui-build-date=${BUILD_DATE}" > /tmp/ui-build-info.txt
 
-# Compilar el frontend
-RUN npm run build
+# 4. Generar el bundle de producción
+RUN deno task build
 
 # ==========================================
 # Etapa 1: Builder Backend (Python con uv)
