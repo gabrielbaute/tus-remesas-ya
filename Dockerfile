@@ -45,22 +45,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Crear usuario, grupo y directorios de persistencia con ownership
-RUN groupadd -r tus_remesas_ya -g 1000 && \
-    useradd -u 1000 -g tus_remesas_ya -m -s /bin/bash tus_remesas_ya && \
-    mkdir -p /logs /instance /app && \
-    chown -R tus_remesas_ya:tus_remesas_ya /logs /instance /app
+RUN groupadd -r tus-remesas-ya -g 1000 && \
+    useradd -u 1000 -g tus-remesas-ya -m -s /bin/bash tus-remesas-ya && \
+    mkdir -p /logs /instance /app /app/.venv && \
+    chown -R tus-remesas-ya:tus-remesas-ya /logs /instance /app /logs
 
 # Copiar archivos del proyecto
-COPY --chown=tus_remesas_ya:tus_remesas_ya . .
+COPY --chown=tus-remesas-ya:tus-remesas-ya . .
 
 # Copiar el bundle generado por el frontend
-COPY --from=ui-builder --chown=tus_remesas_ya:tus_remesas_ya /app/dist /app/app/ui/dist
+COPY --from=ui-builder --chown=tus-remesas-ya:tus-remesas-ya /app/dist /app/app/ui/dist
 
 # Cambiar al usuario no privilegiado antes de instalar dependencias
-USER tus_remesas_ya
+USER tus-remesas-ya
 
 # Crear el entorno virtual e instalar dependencias DIRECTAMENTE en la ubicación final
-RUN --mount=type=cache,id=uv-cache,target=/home/tus_remesas_ya/.cache/uv,uid=1000,gid=1000 \
+RUN --mount=type=cache,id=uv-cache,target=/home/tus-remesas-ya/.cache/uv,uid=1000,gid=1000 \
     uv sync --frozen --no-install-project --no-dev
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
