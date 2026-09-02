@@ -21,7 +21,7 @@ async def get_fiat_pair(
 ):
     """
     Returns the average exchange rate for the selected pair based on stored operational database blocks.
-    
+
     This route evaluates metrics used to estimate remittance conversions across both directions.
     """
     return await exchange_service.get_pair(fiat_1, fiat_2)
@@ -40,7 +40,7 @@ async def get_real_time_pair(
 
 @router.get("/today_pen_ves_pair", response_model=ArbitrageResponse, summary="Get the actual arbitrage values for VES/PES pair on Binance.")
 async def get_today_pen_ves_pair(
-        reveneu_rate: float = Query(1.08, description="Reveneu rate for agency"),
+        reveneu_rate: float = Query(1.045, description="Reveneu rate for agency"),
         arbitrage_service: ArbitrageService = Depends(get_arbitrage_service)
 ):
     """
