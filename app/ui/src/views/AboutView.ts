@@ -17,7 +17,7 @@ export default defineComponent({
   setup() {
     // Número telefónico corporativo para soporte por WhatsApp (formato internacional sin signos)
     const whatsappPhoneNumber: string = "+51952075851";
-    
+
     // Mensaje predeterminado al iniciar la conversación por WhatsApp
     const defaultMessage: string = "¡Hola! Quisiera obtener información sobre el servicio de remesas y las tasas actuales.";
 
